@@ -1,5 +1,5 @@
 build
 dist
-netbeans
 my.properties
-.nbattrs
+*.ipr
+*.iws

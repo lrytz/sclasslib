@@ -3,3 +3,4 @@ dist
 my.properties
 *.ipr
 *.iws
+*.iml

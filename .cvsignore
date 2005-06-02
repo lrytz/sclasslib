@@ -4,3 +4,7 @@ my.properties
 *.ipr
 *.iws
 *.iml
+*.jpr
+*.jws
+Changes.txt
+nbproject

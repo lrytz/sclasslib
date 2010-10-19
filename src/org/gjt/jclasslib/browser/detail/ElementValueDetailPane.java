@@ -6,7 +6,9 @@
 */
 package org.gjt.jclasslib.browser.detail;
 
-import org.gjt.jclasslib.browser.*;
+import org.gjt.jclasslib.browser.AbstractDetailPane;
+import org.gjt.jclasslib.browser.BrowserServices;
+import org.gjt.jclasslib.browser.BrowserTreeNode;
 import org.gjt.jclasslib.browser.detail.elementvalues.*;
 import org.gjt.jclasslib.structures.elementvalues.*;
 
@@ -30,6 +32,8 @@ public class ElementValueDetailPane extends AbstractDetailPane {
     private static final String SCREEN_CLASS_VALUE = "Class";
     private static final String SCREEN_ENUM_VALUE = "Enum";
 
+    // add for scala sig
+    private static final String SCREEN_SCALA_SIG_VALUE = "ScalaSig";
 
     private HashMap elementTypeToDetailPane;
 
@@ -63,6 +67,10 @@ public class ElementValueDetailPane extends AbstractDetailPane {
             paneName = SCREEN_CLASS_VALUE;
         } else if (eve instanceof EnumElementValue) {
             paneName = SCREEN_ENUM_VALUE;
+        }
+        // add for scala sig
+        else if (eve instanceof ScalaSigElementValue) {
+            paneName = SCREEN_SCALA_SIG_VALUE;
         }
 
         CardLayout layout = (CardLayout)specificInfoPane.getLayout();
@@ -99,6 +107,9 @@ public class ElementValueDetailPane extends AbstractDetailPane {
                 SCREEN_CLASS_VALUE);
         addScreen(new EnumElementValueEntryDetailPane(services),
                 SCREEN_ENUM_VALUE);
+        // add for scala sig
+        addScreen(new ScalaSigElementValueEntryDetailPane(services),
+                SCREEN_SCALA_SIG_VALUE);
     }
 
     private void addScreen(AbstractDetailPane detailPane, String name) {

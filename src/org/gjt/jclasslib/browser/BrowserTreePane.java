@@ -7,10 +7,16 @@
 
 package org.gjt.jclasslib.browser;
 
+import org.gjt.jclasslib.browser.config.ScalaConfig;
 import org.gjt.jclasslib.structures.*;
-import org.gjt.jclasslib.structures.attributes.*;
+import org.gjt.jclasslib.structures.attributes.AnnotationDefaultAttribute;
+import org.gjt.jclasslib.structures.attributes.CodeAttribute;
+import org.gjt.jclasslib.structures.attributes.RuntimeAnnotationsAttribute;
 import org.gjt.jclasslib.structures.constants.ConstantLargeNumeric;
-import org.gjt.jclasslib.structures.elementvalues.*;
+import org.gjt.jclasslib.structures.elementvalues.AnnotationElementValue;
+import org.gjt.jclasslib.structures.elementvalues.ArrayElementValue;
+import org.gjt.jclasslib.structures.elementvalues.ElementValue;
+import org.gjt.jclasslib.structures.elementvalues.ElementValuePair;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -413,6 +419,24 @@ public class BrowserTreePane extends JPanel {
                             annotation);
             parentNode.add(entryNode);
             addElementValuePairEntry(entryNode, annotation);
+
+            // **** SCALA ****
+            try {
+                ClassFile classFile = services.getClassFile();
+                if("Lscala/reflect/ScalaSignature;".equals(classFile.getConstantPoolUtf8Entry(annotation.getTypeIndex()).getString())) {
+                    ElementValuePair pair = annotation.getElementValuePairEntries()[0];
+                    if("bytes".equals(classFile.getConstantPoolUtf8Entry(pair.getElementNameIndex()).getString())) {
+                        ScalaConfig.markNode(classFile.getThisClassName(), entryNode);
+                        //String className = classFile.getThisClassName().replace(File.separatorChar, '.');
+                        //ScalaConfig.fillTree(className, entryNode);
+                    }
+                }
+
+            } catch (InvalidByteCodeException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            // ****
         }
     }
 

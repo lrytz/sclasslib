@@ -70,7 +70,10 @@ public class BrowserTreeNode extends DefaultMutableTreeNode {
      * Node for an <tt>ArrayElementValue</tt> entry.
      */
     public static final String NODE_ARRAYELEMENTVALUE = "arrayelementvalue";
-
+    /**
+     * Node for an <tt>ScalaSigDetailPane</tt> entry.
+     */
+    public static final String NODE_SCALASIG = "scalasig";
 
     private String type;
     private int index;

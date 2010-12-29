@@ -113,6 +113,8 @@ public class BrowserDetailPane extends JPanel {
             return new ElementValuePairDetailPane(services);
         } else if (nodeType.equals(BrowserTreeNode.NODE_ARRAYELEMENTVALUE)) {
             return new ArrayElementValueDetailPane(services);
+        } else if (nodeType.equals(BrowserTreeNode.NODE_SCALASIG)) {
+            return new ScalaSigDetailPane(services);
         } else {
             return null;
         }

@@ -68,6 +68,16 @@ public abstract class FixedListDetailPane extends AbstractDetailPane {
                 new DetailPaneEntry(key, value, comment)
             );
     }
+
+    protected void addDetailPaneBlock(ExtendedJLabel key, JComponent value) {
+        if (detailPaneEntries == null) {
+            detailPaneEntries = new ArrayList();
+        }
+
+        detailPaneEntries.add(
+                new DetailPaneEntry(key, null, value)
+            );
+    }
     
     protected void setupComponent() {
         
@@ -116,7 +126,7 @@ public abstract class FixedListDetailPane extends AbstractDetailPane {
             if (entry.comment != null) {
                 add(entry.comment, (entry.value == null) ? gCommentOnly : gComment);
 
-                entry.comment.setAutoTooltip(true);
+                //entry.comment.setAutoTooltip(true);
             }
             
         }
@@ -163,11 +173,11 @@ public abstract class FixedListDetailPane extends AbstractDetailPane {
     private static class DetailPaneEntry {
         public final ExtendedJLabel key;
         public final ExtendedJLabel value;
-        public final ExtendedJLabel comment;
+        public final JComponent comment;
         
         private DetailPaneEntry(ExtendedJLabel key,
                                 ExtendedJLabel value,
-                                ExtendedJLabel comment) {
+                                JComponent comment) {
             this.key = key;
             this.value = value;
             this.comment = comment;

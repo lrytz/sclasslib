@@ -8,9 +8,16 @@
 package org.gjt.jclasslib.browser;
 
 import org.gjt.jclasslib.browser.config.BrowserConfig;
-import org.gjt.jclasslib.browser.config.classpath.*;
+import org.gjt.jclasslib.browser.config.ScalaConfig;
+import org.gjt.jclasslib.browser.config.classpath.ClasspathArchiveEntry;
+import org.gjt.jclasslib.browser.config.classpath.ClasspathBrowser;
+import org.gjt.jclasslib.browser.config.classpath.ClasspathSetupDialog;
+import org.gjt.jclasslib.browser.config.classpath.FindResult;
 import org.gjt.jclasslib.browser.config.window.WindowState;
-import org.gjt.jclasslib.mdi.*;
+import org.gjt.jclasslib.io.Log;
+import org.gjt.jclasslib.mdi.BasicDesktopManager;
+import org.gjt.jclasslib.mdi.BasicFileFilter;
+import org.gjt.jclasslib.mdi.BasicMDIFrame;
 import org.gjt.jclasslib.structures.ClassFile;
 import org.gjt.jclasslib.structures.InvalidByteCodeException;
 import org.gjt.jclasslib.util.GUIHelper;
@@ -19,7 +26,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.beans.*;
+import java.beans.PropertyVetoException;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.*;
 import java.net.URL;
 import java.util.prefs.Preferences;
@@ -240,6 +249,7 @@ public class BrowserMDIFrame extends BasicMDIFrame {
                 }
                 if (validClasspathEntry) {
                     config.addClasspathDirectory(currentDirectory.getPath());
+                    ScalaConfig.insertSignatureDetails(className);
                 }
             } catch (InvalidByteCodeException e) {
             }
@@ -480,6 +490,11 @@ public class BrowserMDIFrame extends BasicMDIFrame {
             classpathBrowser.setClasspathComponent(config);
         }
         updateTitle();
+
+        config.addScalaLib();
+        ScalaConfig.setConfig(config);        
+        config.addClasspathChangeListener(ScalaConfig.instance());
+        ScalaConfig.updateGlobal();
     }
 
     private void doOpenWorkspace() {
@@ -541,6 +556,11 @@ public class BrowserMDIFrame extends BasicMDIFrame {
         ClassFile classFile = frame.getClassFile();
         if (classFile != null) {
             config.addClasspathArchive(file.getPath());
+            try {
+                ScalaConfig.insertSignatureDetails(classFile.getThisClassName());
+            } catch (InvalidByteCodeException e) {
+                Log.error(e.getMessage());
+            }
         }
 
         return frame;

@@ -6,15 +6,12 @@ import java.io. {PrintStream, ByteArrayOutputStream, DataOutput, DataInput}
 import reflect.generic.ByteCodecs
 import tools.nsc.util.ShowPickled
 import org.gjt.jclasslib.io.Log
-import java.util.Arrays
 
 /**
  * Special ElementValue handling the Scala signature structure.
  * This class follows the <tt>ConstElementValue</tt> in the structure description.
  * @author Lomig Mégard
- * @Date 18.10.10
  */
-
 class ScalaSigElementValue(tag: Int) extends ElementValue(tag) {
 
   private var constValueIndex = -1
@@ -26,7 +23,7 @@ class ScalaSigElementValue(tag: Int) extends ElementValue(tag) {
 
   def getFormattedSig = formattedSig
 
-  protected def getSpecificLength = ScalaSigElementValue.LENGTH
+  protected[elementvalues] def getSpecificLength = ScalaSigElementValue.LENGTH
 
   def getEntryName = ScalaSigElementValue.ENTRY_NAME
 
@@ -34,28 +31,22 @@ class ScalaSigElementValue(tag: Int) extends ElementValue(tag) {
   private def extractSig() {
     val enc = classFile.getConstantPoolUtf8Entry(constValueIndex).getBytes()
 
-    Log.debug("enc  = " + Arrays.toString(enc))
-
-
     val newSize = ByteCodecs.decode(enc)
-    Log.debug("enc2 = " + Arrays.toString(enc))
-
     val dec = new Array[Byte](newSize)
-
     Array.copy(enc, 0, dec, 0, newSize)
 
-    Log.debug("dec  = " + Arrays.toString(dec))
-
-
-    ShowPickled.fromBytes(dec) match {
-      case Some(buffer) =>
-        val baos = new ByteArrayOutputStream()
-        ShowPickled.printFile(buffer, new PrintStream(baos))
-        formattedSig = baos.toString("UTF8")
-      case None =>
-        //TODO how handles this error ?
-        Log.error("error occurs during scala sig parsing !")
-        formattedSig = "error occurs during scala sig parsing !"
+    val baos = new ByteArrayOutputStream()
+    try {
+      ShowPickled.fromBytes(dec) match {
+        case Some(buffer) =>
+          ShowPickled.printFile(buffer, new PrintStream(baos))
+          formattedSig = baos.toString("UTF-8")
+        case None =>
+          Log.error("error occurs during scala sig parsing !")
+          formattedSig = "error occurs during scala sig parsing !"
+      }
+    } catch { case e =>
+        Log.error(e.getMessage)
     }
   }
 
@@ -63,8 +54,6 @@ class ScalaSigElementValue(tag: Int) extends ElementValue(tag) {
     super.read(in)
 
     constValueIndex = in.readUnsignedShort()
-
-    //TODO uncomment
     extractSig
 
     if (debug) debug("read ")
@@ -78,7 +67,7 @@ class ScalaSigElementValue(tag: Int) extends ElementValue(tag) {
     if (debug) debug("wrote ")
   }
 
-  protected override def debug(message: String) = {
+  protected[structures] override def debug(message: String) = {
     super.debug(message + "ScalaSig with const_value_index " + constValueIndex)
   }
 }

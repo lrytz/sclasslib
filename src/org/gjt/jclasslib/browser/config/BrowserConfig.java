@@ -9,6 +9,7 @@ package org.gjt.jclasslib.browser.config;
 
 import org.gjt.jclasslib.browser.config.classpath.*;
 import org.gjt.jclasslib.mdi.MDIConfig;
+import scala.ScalaObject;
 
 import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
@@ -126,6 +127,19 @@ public class BrowserConfig implements ClasspathComponent {
     public void addRuntimeLib() {
 
         String fileName = String.class.getResource("String.class").toExternalForm();
+        Matcher matcher = Pattern.compile("jar:file:/(.*)!.*").matcher(fileName);
+        if (matcher.matches()) {
+            String path = matcher.group(1);
+            if (path.indexOf(':') == -1) {
+                path = "/" + path;
+            }
+            addClasspathArchive(new File(path).getPath());
+            fireClasspathChanged(false);
+        }
+    }
+
+    public void addScalaLib() {
+        String fileName = ScalaObject.class.getResource("ScalaObject.class").toExternalForm();
         Matcher matcher = Pattern.compile("jar:file:/(.*)!.*").matcher(fileName);
         if (matcher.matches()) {
             String path = matcher.group(1);

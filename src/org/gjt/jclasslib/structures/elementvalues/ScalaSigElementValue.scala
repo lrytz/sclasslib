@@ -46,7 +46,7 @@ class ScalaSigElementValue(tag: Int) extends ElementValue(tag) {
           formattedSig = "error occurs during scala sig parsing !"
       }
     } catch { case e =>
-        Log.error(e.getMessage)
+      formattedSig = baos.toString("UTF-8") + "\nerror occurs during scala sig parsing !"
     }
   }
 

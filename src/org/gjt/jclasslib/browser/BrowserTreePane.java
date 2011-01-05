@@ -8,6 +8,7 @@
 package org.gjt.jclasslib.browser;
 
 import org.gjt.jclasslib.browser.config.ScalaConfig;
+import org.gjt.jclasslib.io.Log;
 import org.gjt.jclasslib.structures.*;
 import org.gjt.jclasslib.structures.attributes.AnnotationDefaultAttribute;
 import org.gjt.jclasslib.structures.attributes.CodeAttribute;
@@ -423,19 +424,18 @@ public class BrowserTreePane extends JPanel {
             // **** SCALA ****
             try {
                 ClassFile classFile = services.getClassFile();
-                if("Lscala/reflect/ScalaSignature;".equals(classFile.getConstantPoolUtf8Entry(annotation.getTypeIndex()).getString())) {
+                String name = classFile.getConstantPoolUtf8Entry(annotation.getTypeIndex()).getString();
+                if("Lscala/reflect/ScalaSignature;".equals(name) ||
+                   "Lscala/reflect/ScalaLongSignature;".equals(name)) {
                     ElementValuePair pair = annotation.getElementValuePairEntries()[0];
                     if("bytes".equals(classFile.getConstantPoolUtf8Entry(pair.getElementNameIndex()).getString())) {
                         ScalaConfig.markNode(classFile.getThisClassName(), entryNode);
-                        //String className = classFile.getThisClassName().replace(File.separatorChar, '.');
-                        //ScalaConfig.fillTree(className, entryNode);
                     }
                 }
 
             } catch (InvalidByteCodeException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                Log.error("Error occurs during checking the Scala signature.");
             }
-
             // ****
         }
     }

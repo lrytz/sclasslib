@@ -55,7 +55,7 @@ object ScalaConfig extends ClasspathChangeListener {
     }
   }
 
-  def getClassSymbol(name: String) = {
+  private def getClassSymbol(name: String) = {
     val g = global
     val typeName = g.newTermName(name)
     val sym = g.definitions.getClass(typeName)
@@ -63,12 +63,12 @@ object ScalaConfig extends ClasspathChangeListener {
     sym
   }
 
-  def fillTree(className: String, parent: BrowserTreeNode): Unit = {
+  private def fillTree(className: String, parent: BrowserTreeNode): Unit = {
     val classSym = getClassSymbol(className)
-    fillTree(classSym, 0, parent)
+    fillTree(classSym, 1, parent)
   }
 
-  def fillTree(sym: Symbols#Symbol, index: Int, parent: BrowserTreeNode): Unit = {
+  private def fillTree(sym: Symbols#Symbol, index: Int, parent: BrowserTreeNode): Unit = {
     val entryNode =
       new BrowserTreeNode("[" + index + "] " + sym.nameString,
         BrowserTreeNode.NODE_SCALASIG,
@@ -82,34 +82,6 @@ object ScalaConfig extends ClasspathChangeListener {
         fillTree(memberSym, i, entryNode)
       }
     }
-  }
-
-  def main(args: Array[String]): Unit = {
-    val cp = ".:/Users/lomig/Documents/EPFL/3eme_annee/sclasslib/scala/target/pack/lib/scala-library.jar"
-
-    val settings = new Settings()
-    settings.processArguments(List("-cp", cp,
-                                   "-verbose"), false)
-    println("settings=" + settings)
-
-    val g = new Global(settings)
-    val run = new g.Run()
-
-    val name = g.newTermName("scala.Array")
-
-    val sym = g.definitions.getClass(name)
-    println("sym=" + sym)
-
-    val t = sym.info
-    val symbols = t.decls.toList
-
-    println(symbols)
-
-    symbols foreach { s =>
-      println(s.nameString)
-    }
-
-
   }
 
 }

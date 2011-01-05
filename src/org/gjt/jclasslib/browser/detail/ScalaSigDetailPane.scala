@@ -93,7 +93,7 @@ class ScalaSigDetailPane(services: BrowserServices) extends AbstractDetailPane(s
     lblOwner.setText(ssdev.ownerName)
     lblType.setText(ssdev.tpe)
     lblFlags.setText(ssdev.flags)
-    lblAnno.setText(ssdev.annotations.foldLeft("")(_ + ";\n" + _))
+    lblAnno.setText(ssdev.annotations.mkString(";"))
 
     scrollPane.getViewport().setViewPosition(new Point(0, 0))
   }

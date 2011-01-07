@@ -586,6 +586,7 @@ public class BrowserMDIFrame extends BasicMDIFrame {
         repaintNow();
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         BrowserInternalFrame frame = new BrowserInternalFrame(desktopManager, new WindowState(findResult.getFileName()));
+        ScalaConfig.insertSignatureDetails(selectedClassName);
         try {
             frame.setMaximum(true);
         } catch (PropertyVetoException ex) {

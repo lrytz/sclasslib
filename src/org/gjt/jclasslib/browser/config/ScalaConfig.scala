@@ -2,10 +2,12 @@ package org.gjt.jclasslib.browser.config
 
 import classpath.{ClasspathEntry, ClasspathChangeEvent, ClasspathChangeListener}
 import org.gjt.jclasslib.browser._
-import tools.nsc.{Settings, Global}
 import org.gjt.jclasslib.structures.elementvalues.ScalaSigDetailElementValue
 import java.io.File
-import org.gjt.jclasslib.io.Log
+import tools.nsc.{Settings, Global}
+import org.gjt.jclasslib.util.GUIHelper
+import javax.swing.JOptionPane
+
 /**
  * 
  * @author Lomig Mégard
@@ -16,7 +18,7 @@ object ScalaConfig extends ClasspathChangeListener {
   // hack to get this instance from Java
   def instance = this
 
-  private var global: SclasslibGlobal = _
+  private var global: Option[SclasslibGlobal] = None
   private var config: BrowserConfig = _
 
   /*
@@ -29,14 +31,20 @@ object ScalaConfig extends ClasspathChangeListener {
   def classpathChanged(event: ClasspathChangeEvent) = updateGlobal()
 
   def updateGlobal() {
-    val cp = "-cp " + config.getClasspath.toArray.toList.asInstanceOf[List[ClasspathEntry]].map{cpe => cpe.getFileName}.mkString(":")
-    val settings = new Settings()
-    settings.processArgumentString(cp)
-
-    val g = new SclasslibGlobal(settings)
-    val run = new g.Run()
-    global = g
-
+    try {
+      val cp = "-cp " + config.getClasspath.toArray.toList.asInstanceOf[List[ClasspathEntry]].map{cpe => cpe.getFileName}.mkString(":")
+      val settings = new Settings()
+      settings.processArgumentString(cp)
+      val g = new SclasslibGlobal(settings)
+      val run = new g.Run()
+      global = Some(g)
+    } catch { case e =>
+      GUIHelper.showMessage(null,
+        "The Scala library is not in the classpath. The Scala signatures details will not be displayed.",
+        JOptionPane.WARNING_MESSAGE
+      )
+      global = None
+    }
   }
 
   def markNode(className: String, parent: BrowserTreeNode): Unit = {
@@ -44,12 +52,15 @@ object ScalaConfig extends ClasspathChangeListener {
   }
 
   def insertSignatureDetails(className: String): Unit = {
+    if(global.isEmpty)
+      return; // There were an error, don't try to add the signature.
+
     markedNodes.get(className) match {
       case Some(parent) =>
-        global.fillTree(className.replace(File.separatorChar, '.'), parent)
+        global.get.fillTree(className.replace(File.separatorChar, '.'), parent)
         markedNodes -= className
       case None =>
-        Log.error("Try to insert nodes in " + className + ", but this class had not been marked.")
+        // Do nothing: this class has not be marked. Could be a Java class.
     }
   }
 
